@@ -426,6 +426,35 @@ function ScanPageInner() {
     setMode("bio-live");
   }, []);
 
+  /* ═══════════════════ REAL-TIME TRACKER FOR WEBCAM ═══════════════════ */
+  useEffect(() => {
+    if (mode !== "webcam") {
+      setDetectedLandmarks(null);
+      return;
+    }
+    let cancelled = false;
+    const runTracker = async () => {
+      await initLivenessModels();
+      if (cancelled) return;
+      
+      const loop = async () => {
+        if (cancelled || mode !== "webcam") return;
+        const vid = webcamRef.current?.video;
+        if (vid && vid.readyState >= 2) {
+          const frame = await detectLivenessFrame(vid);
+          if (frame.faceDetected && frame.landmarks) {
+            setDetectedLandmarks(frame.landmarks);
+            setDetectedImageSize({ w: vid.videoWidth, h: vid.videoHeight });
+          }
+        }
+        requestAnimationFrame(loop);
+      };
+      loop();
+    };
+    runTracker();
+    return () => { cancelled = true; };
+  }, [mode, webcamRef]);
+
   const captureWebcam = useCallback(() => {
     const src = webcamRef.current?.getScreenshot();
     if (src) startParticleAnalysis(src);
@@ -540,10 +569,21 @@ function ScanPageInner() {
               <motion.div key="webcam" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="w-full max-w-lg">
                 <div className="relative rounded-3xl overflow-hidden bg-black aspect-[3/4]">
                   <Webcam ref={webcamRef} audio={false} screenshotFormat="image/jpeg" className="w-full h-full object-cover" mirrored />
+                  
+                  {/* Real-time Tracking Dots */}
+                  <div className="absolute inset-0 pointer-events-none z-20">
+                    <FaceMeshOverlay 
+                      progress={detectedLandmarks ? 100 : 0} 
+                      landmarks={detectedLandmarks} 
+                      imageWidth={detectedImageSize?.w} 
+                      imageHeight={detectedImageSize?.h} 
+                    />
+                  </div>
+
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-48 h-64 rounded-full border-2 border-[#0096FF] opacity-60" style={{ boxShadow: "0 0 20px rgba(0,150,255,0.3)" }} />
                   </div>
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 left-4 z-30">
                     <motion.button whileTap={{ scale: 0.9 }} onClick={() => setMode("idle")}
                       className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white"><X size={18} /></motion.button>
                   </div>
