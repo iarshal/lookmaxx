@@ -426,34 +426,8 @@ function ScanPageInner() {
     setMode("bio-live");
   }, []);
 
-  /* ═══════════════════ REAL-TIME TRACKER FOR WEBCAM ═══════════════════ */
-  useEffect(() => {
-    if (mode !== "webcam") {
-      setDetectedLandmarks(null);
-      return;
-    }
-    let cancelled = false;
-    const runTracker = async () => {
-      await initLivenessModels();
-      if (cancelled) return;
-      
-      const loop = async () => {
-        if (cancelled || mode !== "webcam") return;
-        const vid = webcamRef.current?.video;
-        if (vid && vid.readyState >= 2) {
-          const frame = await detectLivenessFrame(vid);
-          if (frame.faceDetected && frame.landmarks) {
-            setDetectedLandmarks(frame.landmarks);
-            setDetectedImageSize({ w: vid.videoWidth, h: vid.videoHeight });
-          }
-        }
-        requestAnimationFrame(loop);
-      };
-      loop();
-    };
-    runTracker();
-    return () => { cancelled = true; };
-  }, [mode, webcamRef]);
+  /* ═══════════════════ REAL-TIME TRACKER REMOVED FOR PERFORMANCE ═══════════════════ */
+  // Removed to fix mobile lag as requested. Particles now only sync during analysis.
 
   const captureWebcam = useCallback(() => {
     const src = webcamRef.current?.getScreenshot();
@@ -496,7 +470,11 @@ function ScanPageInner() {
         }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <motion.button whileTap={{ scale: 0.95 }}
-            onClick={() => mode === "webcam" ? setMode("idle") : handleTryAgain()}
+            onClick={() => {
+              if (mode === "idle") router.push("/");
+              else if (mode === "webcam") setMode("idle");
+              else handleTryAgain();
+            }}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
             <ChevronLeft size={20} /><span className="font-medium">Back</span>
           </motion.button>
@@ -570,15 +548,8 @@ function ScanPageInner() {
                 <div className="relative rounded-3xl overflow-hidden bg-black aspect-[3/4]">
                   <Webcam ref={webcamRef} audio={false} screenshotFormat="image/jpeg" className="w-full h-full object-cover" mirrored />
                   
-                  {/* Real-time Tracking Dots */}
-                  <div className="absolute inset-0 pointer-events-none z-20">
-                    <FaceMeshOverlay 
-                      progress={detectedLandmarks ? 100 : 0} 
-                      landmarks={detectedLandmarks} 
-                      imageWidth={detectedImageSize?.w} 
-                      imageHeight={detectedImageSize?.h} 
-                    />
-                  </div>
+                  {/* Real-time Tracking Dots REMOVED for mobile performance */}
+                  {/* Now dots only appear during 'analyzing' phase below */}
 
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-48 h-64 rounded-full border-2 border-[#0096FF] opacity-60" style={{ boxShadow: "0 0 20px rgba(0,150,255,0.3)" }} />
