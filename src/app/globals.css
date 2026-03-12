@@ -1,26 +1,261 @@
 @import "tailwindcss";
 
+@theme {
+  --font-body: var(--font-body), "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-body), "DM Sans", system-ui, -apple-system, sans-serif;
+  --color-pink-deep: #FF1493;
+  --color-pink-light: #FFB6C1;
+  --color-pink-soft: #FFF0F6;
+  --color-lavender: #F0E6FF;
+  --color-mint: #E6FFF0;
+  --color-peach: #FFF0E6;
+  --color-sky: #E6F4FF;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --pink-glow: #FF1493;
+  --pink-light: #FFB6C1;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: #F2F2F7;
+}
+
+/* ─── Premium typography ─── */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Font utility */
+@utility font-body {
+  font-family: var(--font-body), "DM Sans", system-ui, sans-serif;
+}
+
+@utility font-display {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* ─── Gradient text ─── */
+@utility text-gradient-pink {
+  background: linear-gradient(135deg, #FF1493, #FF69B4, #FFB6C1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility text-gradient-blue {
+  background: linear-gradient(135deg, #0A84FF, #5AC8FA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Glows (softer, more pastel) ─── */
+@utility glow-pink {
+  box-shadow: 0 4px 20px rgba(255, 20, 147, 0.2), 0 0 50px rgba(255, 20, 147, 0.08);
+}
+
+@utility glow-pink-sm {
+  box-shadow: 0 2px 12px rgba(255, 20, 147, 0.15), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+@utility glow-blue {
+  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.2), 0 0 50px rgba(10, 132, 255, 0.08);
+}
+
+/* ─── iOS Glass morphism ─── */
+@utility glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.03);
+}
+
+@utility glass-nav {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(150%) blur(30px);
+  -webkit-backdrop-filter: saturate(150%) blur(30px);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03), 0 0.5px 0 rgba(0, 0, 0, 0.02), inset 0 0.5px 0 rgba(255, 255, 255, 0.9);
+}
+
+@utility glass-strong {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(30px);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* ─── Soft pastel cards ─── */
+@utility card {
+  background: white;
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03), 0 0.5px 0 rgba(0, 0, 0, 0.01);
+}
+
+@utility card-hover {
+  background: white;
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03), 0 0.5px 0 rgba(0, 0, 0, 0.01);
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  &:hover {
+    border-color: rgba(255, 20, 147, 0.15);
+    box-shadow: 0 8px 30px rgba(255, 20, 147, 0.06), 0 2px 10px rgba(0, 0, 0, 0.03);
+    transform: translateY(-3px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(150%) blur(24px);
+  -webkit-backdrop-filter: saturate(150%) blur(24px);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.02), inset 0 0.5px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* ─── iOS Segmented Control ─── */
+@utility ios-segment {
+  background: rgba(118, 118, 128, 0.1);
+  border-radius: 0.625rem;
+  padding: 3px;
+}
+
+@utility ios-segment-active {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+/* ─── Terminal text style ─── */
+@utility terminal-text {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Monaco, "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* ─── Animations ─── */
+@keyframes laser-sweep {
+  0% { top: 0%; }
+  50% { top: 95%; }
+  100% { top: 0%; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.7; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes soft-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.laser-line {
+  animation: laser-sweep 2s ease-in-out infinite;
+}
+
+.pulse-animation {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
+.gentle-pulse {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.soft-bounce {
+  animation: soft-bounce 3s ease-in-out infinite;
+}
+
+@keyframes douyin-stark-flash {
+  0%, 24% { background-color: #0044FF; } /* Solid Blue */
+  25%, 49% { background-color: #00FF00; } /* Solid Green */
+  50%, 74% { background-color: #FF0000; } /* Solid Red */
+  75%, 100% { background-color: #FFFFFF; } /* Piercing White */
+}
+.animate-douyin-flash {
+  animation: douyin-stark-flash 1.5s steps(1) 2;
+}
+
+/* ─── iOS-style custom scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* ─── iOS-like selection (soft pink) ─── */
+::selection {
+  background: rgba(255, 20, 147, 0.12);
 }

@@ -1,0 +1,1 @@
+[  619112ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/models/tiny_face_detector_model.bin:0
