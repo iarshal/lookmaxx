@@ -155,55 +155,58 @@ export default function FaceMeshOverlay({progress,landmarks,imageWidth,imageHeig
       const np=Math.min(1,progress/100);
       const ps=psRef.current;
 
-      // 0-0.30: free floating drift across canvas
-      // 0.30-1.0: smoothly pulled toward face targets
-      const CHAOS=0.30;
-      const converge=np<CHAOS?0:Math.pow((np-CHAOS)/(1-CHAOS),1.5);
+      // np is 0 to 1
+      const CHAOS = 0.15;
+      const progressFactor = np < CHAOS ? 0 : (np - CHAOS) / (1 - CHAOS);
 
       for(let i=0;i<ps.length;i++){
         const p=ps[i];
 
-        // Gentle orbital drift (always active, creates smooth movement)
-        p.angle += (.005 + p.speed*.008) * (1-converge*.7);
-        const driftR = (1-converge) * (W*.12 + Math.sin(t*.3+p.po)*W*.04);
+        // MAGIC: Staggered Convergence
+        // Each particle has a "threshold" based on its relative index.
+        const particleThreshold = i / ps.length; 
+        // Only start converging if progressFactor exceeds the particle's threshold
+        // We use a smooth transition (lerp) for the convergence state of EACH particle
+        const pConvergeRaw = (progressFactor - particleThreshold * 0.8) * 5;
+        const pConverge = Math.max(0, Math.min(1, pConvergeRaw));
+        const pEase = Math.pow(pConverge, 1.5);
+
+        // Gentle orbital drift (always active, but fades as particle settles)
+        p.angle += (.005 + p.speed*.008) * (1 - pEase*.9);
+        const driftR = (1 - pEase) * (W*.12 + Math.sin(t*.3+p.po)*W*.04);
         const driftX = Math.cos(p.angle + t*.2 + p.po) * driftR * .015;
         const driftY = Math.sin(p.angle + t*.15 + p.po*.7) * driftR * .012;
 
-        if(converge < .01){
-          // Free drift phase — smooth floating, NO bouncing
+        if(pEase < 0.001){
+          // Free drift phase
           p.x += driftX + Math.sin(t*.5+p.po*2)*.8;
           p.y += driftY + Math.cos(t*.4+p.po*3)*.6;
-          // Soft wrap instead of bounce
           if(p.x<-20)p.x=W+20; if(p.x>W+20)p.x=-20;
           if(p.y<-20)p.y=H+20; if(p.y>H+20)p.y=-20;
         } else {
-          // Converge toward target — smooth easing, no jitter
+          // Individual convergence for this specific particle
           const dx=p.tx-p.x, dy=p.ty-p.y;
           const dist=Math.sqrt(dx*dx+dy*dy);
+          const activeEase = pEase * (p.type===0?.07:.04);
 
-          // Easing: starts slow, accelerates as converge increases
-          const ease = converge * (p.type===0?.07:.04);
-
-          if(dist>2){
-            p.x += dx*ease + driftX*(1-converge);
-            p.y += dy*ease + driftY*(1-converge);
+          if(dist > 1.5){
+            p.x += dx*activeEase + driftX*(1-pEase);
+            p.y += dy*activeEase + driftY*(1-pEase);
           } else {
-            // Settled: very gentle breathing
-            p.x = p.tx + Math.sin(t*1.5+p.po)*(1-converge*.5);
-            p.y = p.ty + Math.cos(t*1.2+p.po)*.7*(1-converge*.5);
+            // Settled core breathing
+            p.x = p.tx + Math.sin(t*1.5+p.po)*(1-pEase*.6);
+            p.y = p.ty + Math.cos(t*1.2+p.po)*.7*(1-pEase*.6);
           }
         }
 
-        // Alpha
-        const fadeIn=Math.min(1,t*.5);
-        const pulse=.87+.13*Math.sin(t*2+p.po);
-        let alpha=fadeIn*pulse;
+        // Alpha scaling
+        const fadeIn = Math.min(1, t*.5);
+        const pulse = .87 + .13*Math.sin(t*2+p.po);
+        let alpha = fadeIn * pulse;
 
-        // Particles get brighter as they near their target
-        if(converge>.1){
-          const d=Math.sqrt((p.x-p.tx)**2+(p.y-p.ty)**2);
-          const near=1-Math.min(1,d/(Math.min(W,H)*.25));
-          alpha*=(.4+near*.6);
+        // Visual "Landing" Glow: Brighten up as it converges
+        if(pEase > 0.1){
+          alpha *= (0.4 + pEase * 0.6);
         }
 
         // Draw glow
