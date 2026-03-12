@@ -15,6 +15,7 @@ interface Props {
   landmarks?: { x: number; y: number }[] | null;
   imageWidth?: number;
   imageHeight?: number;
+  showScanLine?: boolean;
 }
 
 const LM68:{x:number;y:number}[]=[
@@ -69,7 +70,9 @@ function buildFill(lm:{x:number;y:number}[]):{x:number;y:number}[]{
   loop(CT.le);loop(CT.re);loop(CT.om);loop(CT.im);
 
   // Dense fill using ellipse within face bounds — keeps within jawline
-  for(let i=0;i<3500;i++){
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const count = isMobile ? 800 : 2500;
+  for(let i=0;i<count;i++){
     const a=Math.random()*Math.PI*2;
     const r=Math.sqrt(Math.random()); // uniform disk
     const px=cx+Math.cos(a)*r*fW*.46;
@@ -84,7 +87,7 @@ function buildFill(lm:{x:number;y:number}[]):{x:number;y:number}[]{
   return pts;
 }
 
-export default function FaceMeshOverlay({progress,landmarks,imageWidth,imageHeight}:Props){
+export default function FaceMeshOverlay({progress,landmarks,imageWidth,imageHeight,showScanLine=true}:Props){
   const canvasRef=useRef<HTMLCanvasElement>(null);
   const psRef=useRef<P[]>([]);
   const rafRef=useRef(0);
@@ -128,7 +131,9 @@ export default function FaceMeshOverlay({progress,landmarks,imageWidth,imageHeig
         ps.push({x:Math.random()*W,y:Math.random()*H,tx:fp.x*W,ty:fp.y*H,
           angle:Math.random()*Math.PI*2,speed:.15+Math.random()*.4,sz:.7+Math.random()*.9,po:Math.random()*Math.PI*2,type:1});
       }
-      for(let i=0;i<800;i++){
+      const isMobile = window.innerWidth < 768;
+      const ambientCount = isMobile ? 200 : 500;
+      for(let i=0;i<ambientCount;i++){
         const a=Math.random()*Math.PI*2;
         ps.push({x:Math.random()*W,y:Math.random()*H,tx:(.5+Math.cos(a)*(.08+Math.random()*.32))*W,ty:(.45+Math.sin(a)*(.08+Math.random()*.32))*H,
           angle:Math.random()*Math.PI*2,speed:.1+Math.random()*.25,sz:.4+Math.random()*.6,po:Math.random()*Math.PI*2,type:2});
@@ -255,7 +260,7 @@ export default function FaceMeshOverlay({progress,landmarks,imageWidth,imageHeig
       }
 
       // Soft horizontal scan line
-      if(np<.88){
+      if(showScanLine && np<.88){
         const sw=(1-np)*.22;
         const ly=((Date.now()/16)%H);
         const g=ctx.createLinearGradient(0,ly-30,0,ly+30);

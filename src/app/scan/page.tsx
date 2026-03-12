@@ -576,39 +576,39 @@ function ScanPageInner() {
                 <div className="relative rounded-3xl overflow-hidden aspect-[3/4] bg-black"
                   style={{ boxShadow: "0 0 60px rgba(0,180,255,0.18), 0 20px 60px rgba(0,0,0,0.3)" }}>
                   {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
-                  <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.45) 100%)" }} />
-                  <FaceMeshOverlay progress={progress} landmarks={detectedLandmarks} imageWidth={detectedImageSize?.w} imageHeight={detectedImageSize?.h} />
+                  {capturedImage && <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />}
+                  <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.1) 100%)" }} />
+                  <FaceMeshOverlay progress={progress} landmarks={detectedLandmarks} imageWidth={detectedImageSize?.w} imageHeight={detectedImageSize?.h} showScanLine={false} />
                 </div>
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                  className="rounded-2xl overflow-hidden"
-                  style={{ background: "rgba(6,12,30,0.92)", backdropFilter: "blur(24px)", border: "1px solid rgba(0,200,255,0.18)" }}>
-                  <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(0,200,255,0.1)" }}>
-                    <div className="flex items-center gap-2.5">
-                      <motion.div className="w-2 h-2 rounded-full bg-[#00C8FF]" animate={{ opacity: [1, .3, 1] }} transition={{ duration: 1.1, repeat: Infinity }} />
-                      <span className="text-[10px] font-bold tracking-[0.14em] text-[#00C8FF]">ANALYZING</span>
+                  className="rounded-3xl overflow-hidden shadow-xl"
+                  style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.5)" }}>
+                  <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+                    <div className="flex items-center gap-3">
+                      <motion.div className="w-2.5 h-2.5 rounded-full bg-[#FF1493]" animate={{ opacity: [1, .3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
+                      <span className="text-xs font-black tracking-widest text-gray-900 uppercase">Analysis in Progress</span>
                     </div>
-                    <span className="font-mono text-base font-black tabular-nums" style={{ color: "#00E5FF" }}>{Math.round(progress)}%</span>
+                    <span className="font-mono text-lg font-black tabular-nums text-[#FF1493]">{Math.round(progress)}%</span>
                   </div>
-                  <div className="relative h-[3px] overflow-hidden" style={{ background: "rgba(0,180,255,0.1)" }}>
-                    <motion.div className="absolute inset-y-0 left-0" style={{ background: "linear-gradient(90deg,#0050EE,#0096FF,#00D0FF)" }}
-                      animate={{ width: `${progress}%` }} transition={{ duration: 0.7, ease: "easeOut" }} />
+                  <div className="relative h-[4px] overflow-hidden" style={{ background: "rgba(0,0,0,0.03)" }}>
+                    <motion.div className="absolute inset-y-0 left-0" style={{ background: "linear-gradient(90deg, #FF1493, #FF69B4, #FF1493)" }}
+                      animate={{ width: `${progress}%` }} transition={{ duration: 0.5, ease: "easeOut" }} />
                   </div>
-                  <div className="px-5 py-3 flex flex-col gap-[5px]">
+                  <div className="px-6 py-6 flex flex-col gap-3">
                     {ANALYSIS_STEPS.map((step) => {
                       if (!visibleSteps.includes(step.id)) return null;
                       const isDone = activeStep > step.id; const isActive = activeStep === step.id;
                       return (
-                        <motion.div key={step.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3">
-                          <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
-                            {isDone ? <div className="w-4 h-4 rounded-full flex items-center justify-center"
-                              style={{ background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.5)" }}>
-                              <span className="text-[8px] font-bold" style={{ color: "#00C8FF" }}>✓</span></div>
-                              : isActive ? <motion.div className="w-4 h-4 rounded-full border-2"
-                                style={{ borderColor: "#00C8FF", borderTopColor: "transparent" }}
-                                animate={{ rotate: 360 }} transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }} />
-                                : <div className="w-1.5 h-1.5 rounded-full" style={{ background: "rgba(0,120,180,0.25)" }} />}
+                        <motion.div key={step.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-4">
+                          <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                            {isDone ? <div className="w-5 h-5 rounded-full flex items-center justify-center bg-green-50 text-green-500 border border-green-100">
+                                <Check size={12} strokeWidth={3} /></div>
+                              : isActive ? <motion.div className="w-5 h-5 rounded-full border-2"
+                                style={{ borderColor: "#FF1493", borderTopColor: "transparent" }}
+                                animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
+                                : <div className="w-2 h-2 rounded-full bg-gray-200" />}
                           </div>
-                          <span className="text-[11px] font-medium flex-1" style={{ color: isDone ? "#2A5570" : isActive ? "#E8F8FF" : "#0E2035" }}>
+                          <span className={`text-sm font-bold transition-colors ${isDone ? "text-gray-400" : isActive ? "text-[#FF1493]" : "text-gray-500"}`}>
                             {step.text}
                           </span>
                         </motion.div>
